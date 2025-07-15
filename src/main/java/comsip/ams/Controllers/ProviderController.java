@@ -1,16 +1,13 @@
 package comsip.ams.Controllers;
 
 import java.util.List;
+import java.util.Optional;
 
+import jakarta.validation.constraints.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import comsip.ams.Entities.Provider;
 import comsip.ams.repositories.ProviderRepository;  // **Assure-toi que le package est correct**
@@ -47,5 +44,31 @@ public class ProviderController {
     public ResponseEntity<Provider> saveProvider(@RequestBody Provider provider) {
         Provider savedProvider = providerRepository.save(provider);
         return new ResponseEntity<>(savedProvider, HttpStatus.CREATED);
+    }
+    @GetMapping  ("/{id}")
+    @Operation(summary = "Récupération d'un provider avec son id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Succès de get provider avec id"),
+            @ApiResponse(responseCode = "500", description = "Problème lors de la récupération")
+    })
+    public ResponseEntity<Provider> getAProviderById(@PathVariable int id) {
+       Optional<Provider>  opt= this.providerRepository.findById(id);
+        if (opt.isEmpty())
+        return new ResponseEntity<>( HttpStatus.NOT_FOUND);
+        else
+        return new ResponseEntity<>( opt.get(),HttpStatus.FOUND);
+    }
+    @Operation(summary = "Suppression d'un provider par son id")
+    @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Si provider est trouvé puis supprimé"),
+            @ApiResponse(responseCode = "404", description = "Provider inexistant") })
+    @DeleteMapping ("/{id}")
+    public ResponseEntity<Provider>deleteProviderById(@PathVariable int id){
+        Optional <Provider>opt = this.providerRepository.findById(id);
+        if (opt.isEmpty())
+            return  ResponseEntity.notFound().build();
+        else{
+            this.providerRepository.deleteById( id);
+            return ResponseEntity.noContent().build();
+        }
     }
 }
