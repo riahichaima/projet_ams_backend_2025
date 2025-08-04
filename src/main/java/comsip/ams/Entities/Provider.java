@@ -1,9 +1,9 @@
 package comsip.ams.Entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.List;
+
 @Entity
 public class Provider {
     @Id
@@ -12,6 +12,8 @@ public class Provider {
     private String name;
     private String address;
     private String email;
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Article> articles;
 
     public int getId() {
         return id;
